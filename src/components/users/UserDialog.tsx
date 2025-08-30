@@ -7,18 +7,18 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
+  InputAdornment,
+  IconButton,
 } from '@mui/material';
 import { useState } from 'react';
-import { useActionState } from 'react';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 import type { UserType } from './type';
-import { useActionState } from 'react';
 import type { ActionState } from '../../interfaces';
 import type { UserFormValues } from '../../models';
 import { createInitialState } from '../../helpers';
-
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { useActionState } from '../../hooks/useActionState'; // Ajusta según tu proyecto
 
 export type UserActionState = ActionState<UserFormValues>;
 
@@ -31,27 +31,20 @@ interface Props {
     formData: FormData
   ) => Promise<UserActionState | undefined>;
 }
+
 export const UserDialog = ({ onClose, open, user, handleCreateEdit }: Props) => {
   const initialState = createInitialState<UserFormValues>();
+  const [state, submitAction, isPending] = useActionState(handleCreateEdit, initialState);
 
-  
-  const [state, submitAction, isPending] = useActionState(
-    handleCreateEdit,
-    initialState
-  );
-
-  // Estado para manejar la visibilidad de la contraseña
+  // Estado para visibilidad de contraseña
   const [showPassword, setShowPassword] = useState(false);
 
-  // Función para alternar la visibilidad de la contraseña
-  const handleClickShowPassword = () => {
-    setShowPassword((prevState) => !prevState);
-  };
-  
+  const handleClickShowPassword = () => setShowPassword((prev) => !prev);
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth={'sm'} fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>{user ? 'Editar Usuario' : 'Nuevo Usuario'}</DialogTitle>
-      <Box key={user?.id ?? 'new'} component={'form'} action={submitAction}>
+      <Box component="form" action={submitAction} key={user?.id ?? 'new'}>
         <DialogContent>
           <TextField
             name="username"
@@ -62,56 +55,67 @@ export const UserDialog = ({ onClose, open, user, handleCreateEdit }: Props) => 
             required
             variant="outlined"
             disabled={isPending}
-            defaultValue={state?.formData?.username || user?.username || ''}
+            value={state?.formData?.username || user?.username || ''}
+            onChange={(e) =>
+              state.setFormData({ ...state.formData, username: e.target.value })
+            }
             error={!!state?.errors?.username}
             helperText={state?.errors?.username}
             sx={{ mb: 2 }}
           />
-          {/* Solo si es nuevo */}
- 
-            <TextField
-              name="password"
-              margin="normal"
-              required
-              fullWidth
-              label="Password"
-              type="password"
-              disabled={isPending}
-              defaultValue={state?.formData?.password || user?.password || ''}
-              error={!!state?.errors?.password}
-              helperText={state?.errors?.password}
-               InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={handleClickShowPassword} edge="end">
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <TextField
-              name="confirmPassword"
-              margin="normal"
-              required
-              fullWidth
-              label="Repetir password"
-              type="password"
-              disabled={isPending}
-              defaultValue={state?.formData?.confirmPassword || user?.password || ''}
-              error={!!state?.errors?.confirmPassword}
-              helperText={state?.errors?.confirmPassword}
-               InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={handleClickShowPassword} edge="end">
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            /> 
+
+          {/* Password */}
+          <TextField
+            name="password"
+            margin="normal"
+            required
+            fullWidth
+            label="Password"
+            type={showPassword ? 'text' : 'password'}
+            disabled={isPending}
+            value={state?.formData?.password || user?.password || ''}
+            onChange={(e) =>
+              state.setFormData({ ...state.formData, password: e.target.value })
+            }
+            error={!!state?.errors?.password}
+            helperText={state?.errors?.password}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={handleClickShowPassword} edge="end">
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          <TextField
+            name="confirmPassword"
+            margin="normal"
+            required
+            fullWidth
+            label="Repetir Password"
+            type={showPassword ? 'text' : 'password'}
+            disabled={isPending}
+            value={state?.formData?.confirmPassword || user?.password || ''}
+            onChange={(e) =>
+              state.setFormData({ ...state.formData, confirmPassword: e.target.value })
+            }
+            error={!!state?.errors?.confirmPassword}
+            helperText={state?.errors?.confirmPassword}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={handleClickShowPassword} edge="end">
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
         </DialogContent>
+
         <DialogActions sx={{ p: 2 }}>
           <Button onClick={onClose} color="inherit" disabled={isPending}>
             Cancelar
@@ -121,7 +125,7 @@ export const UserDialog = ({ onClose, open, user, handleCreateEdit }: Props) => 
             variant="contained"
             color="primary"
             disabled={isPending}
-            startIcon={isPending ? <CircularProgress /> : null}
+            startIcon={isPending ? <CircularProgress size={20} /> : null}
           >
             {user ? 'Actualizar' : 'Crear'}
           </Button>
