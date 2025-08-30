@@ -7,6 +7,8 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
+   IconButton, 
+  InputAdornment
 } from '@mui/material';
 import { useState } from 'react';
 import type { UserType } from './type';
