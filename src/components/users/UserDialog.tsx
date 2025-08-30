@@ -18,7 +18,7 @@ import type { UserType } from './type';
 import type { ActionState } from '../../interfaces';
 import type { UserFormValues } from '../../models';
 import { createInitialState } from '../../helpers';
-import { useActionState } from '../../hooks/useActionState'; // Ajusta según tu proyecto
+import { useActionState } from 'react';
 
 export type UserActionState = ActionState<UserFormValues>;
 
