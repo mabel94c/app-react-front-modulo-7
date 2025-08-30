@@ -1,4 +1,4 @@
 export * from './UserDialog';
-export * from './userFilter';
+export * from './UserFilter';
 export * from './UserHeader';
 export * from './UserTabla';
