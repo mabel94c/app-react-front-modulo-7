@@ -52,15 +52,7 @@ export const UserTabla = ({
           variant="outlined"
         />
       ),
-    }, 
- // Texto tal cual
-  {
-    field: 'statusText',
-    headerName: 'Estado (texto)',
-    width: 150,
-    // v7+: valueGetter recibe (value, row)
-    valueGetter: (_value, row) => row.status,
-  },
+    },  
     {
       field: 'actions',
       headerName: 'Acciones',
